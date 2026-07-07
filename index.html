@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>منوی کافه خوارزم | Coffe Sam</title>
+<meta name="description" content="منوی کافه خوارزم — چای، دمنوش، کافی، آب‌میوه، غذا و قلیان" />
+<meta name="theme-color" content="#0b0908" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0b0908;
+    --surface: #151009;
+    --surface-2: #1c1610;
+    --line: #2b2117;
+    --ember: #d9a03f;
+    --ember-deep: #9c6b22;
+    --text: #efe7d8;
+    --muted: #a3937d;
+    --radius: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Vazirmatn", system-ui, sans-serif;
+    font-weight: 300;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100dvh;
+  }
+
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative;
+    text-align: center;
+    padding: 64px 20px 36px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: -40% -20% auto;
+    height: 130%;
+    background: radial-gradient(ellipse 60% 55% at 50% 0%,
+      rgba(217, 160, 63, 0.16), transparent 70%);
+    pointer-events: none;
+  }
+  .hero .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.35em;
+    color: var(--ember);
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+  .hero h1 {
+    font-family: "Lalezar", "Vazirmatn", sans-serif;
+    font-weight: 400;
+    font-size: clamp(44px, 12vw, 72px);
+    line-height: 1.15;
+    margin-top: 10px;
+    color: var(--text);
+  }
+  .hero h1 span { color: var(--ember); }
+  .hero p {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 6px;
+  }
+  .hero .coal {
+    width: 64px; height: 3px;
+    margin: 22px auto 0;
+    border-radius: 3px;
+    background: linear-gradient(90deg, transparent, var(--ember), transparent);
+    box-shadow: 0 0 18px 2px rgba(217, 160, 63, 0.45);
+  }
+
+  /* ---------- sticky nav ---------- */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(11, 9, 8, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    max-width: 720px;
+    margin-inline: auto;
+  }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .nav-inner a {
+    flex: 0 0 auto;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 400;
+    padding: 7px 16px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    transition: color .25s, border-color .25s, background .25s, box-shadow .25s;
+  }
+  .nav-inner a:focus-visible {
+    outline: 2px solid var(--ember);
+    outline-offset: 2px;
+  }
+  .nav-inner a.active {
+    color: #120d06;
+    background: var(--ember);
+    border-color: var(--ember);
+    box-shadow: 0 0 16px rgba(217, 160, 63, 0.35);
+    font-weight: 500;
+  }
+
+  /* ---------- sections ---------- */
+  main {
+    max-width: 720px;
+    margin-inline: auto;
+    padding: 12px 20px 40px;
+  }
+  section { padding-top: 34px; scroll-margin-top: 70px; }
+
+  .sec-head { display: flex; align-items: baseline; gap: 14px; }
+  .sec-head h2 {
+    font-family: "Lalezar", "Vazirmatn", sans-serif;
+    font-weight: 400;
+    font-size: 30px;
+    color: var(--ember);
+    white-space: nowrap;
+  }
+  .sec-head .en {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .sec-head::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(-90deg, var(--ember-deep), transparent);
+    opacity: .6;
+  }
+
+  ul.items { list-style: none; margin-top: 14px; }
+  ul.items li {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 13px 4px;
+    border-bottom: 1px dashed var(--line);
+    font-size: 16.5px;
+  }
+  ul.items li:last-child { border-bottom: none; }
+  .item-name { font-weight: 400; }
+  .item-desc {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 300;
+  }
+  .dots { flex: 1; }
+  .price {
+    color: var(--muted);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* hookah card gets a quiet frame of its own */
+  #ghelyan .card {
+    margin-top: 14px;
+    background: linear-gradient(180deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 6px 18px;
+  }
+  #ghelyan ul.items li { border-color: #342818; }
+
+  /* ---------- notes / footer ---------- */
+  .notes {
+    margin-top: 44px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: 18px 20px;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .notes strong { color: var(--ember); font-weight: 500; }
+  .notes p + p { margin-top: 8px; }
+
+  footer {
+    text-align: center;
+    padding: 28px 20px 40px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  footer .brand {
+    font-family: "Lalezar", sans-serif;
+    font-size: 15px;
+    color: var(--ember);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">COFFE SAM</div>
+  <h1>کافه <span>خوارزم</span></h1>
+  <p>چای · دمنوش · کافی · قلیان</p>
+  <div class="coal" aria-hidden="true"></div>
+</header>
+
+<nav aria-label="دسته‌بندی منو">
+  <div class="nav-inner">
+    <a href="#chai" class="active">چای</a>
+    <a href="#damnush">دمنوش</a>
+    <a href="#coffee">کافی</a>
+    <a href="#juice">آب‌میوه</a>
+    <a href="#food">غذا</a>
+    <a href="#ghelyan">قلیان</a>
+  </div>
+</nav>
+
+<main>
+
+  <section id="chai" aria-labelledby="h-chai">
+    <div class="sec-head"><h2 id="h-chai">چای</h2><span class="en">Tea</span></div>
+    <ul class="items">
+      <li><span class="item-name">چای دمی</span><span class="item-desc">بهار نارنج، گل سرخ، هل</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">چای زعفران</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">چای دارچین</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">چای ماسالا</span><span class="dots"></span><span class="price"></span></li>
+    </ul>
+  </section>
+
+  <section id="damnush" aria-labelledby="h-damnush">
+    <div class="sec-head"><h2 id="h-damnush">دمنوش</h2><span class="en">Herbal</span></div>
+    <ul class="items">
+      <li><span class="item-name">دمنوش زعفران</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">دمنوش انرژی</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">بابونه</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">گل گاوزبان</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">چای ترش</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">بهار نارنج</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">سیب دارچین</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">استوایی</span><span class="dots"></span><span class="price"></span></li>
+    </ul>
+  </section>
+
+  <section id="coffee" aria-labelledby="h-coffee">
+    <div class="sec-head"><h2 id="h-coffee">کافی</h2><span class="en">Coffee</span></div>
+    <ul class="items">
+      <li><span class="item-name">اسپرسو</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">آمریکانو</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">لته</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">کاپوچینو</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">هات چاکلت</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">علی کافه</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">نسکافه</span><span class="dots"></span><span class="price"></span></li>
+    </ul>
+  </section>
+
+  <section id="juice" aria-labelledby="h-juice">
+    <div class="sec-head"><h2 id="h-juice">آب‌میوه</h2><span class="en">Juice</span></div>
+    <ul class="items">
+      <li><span class="item-name">آب هندوانه</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">آب طالبی</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">شیرموز</span><span class="dots"></span><span class="price"></span></li>
+    </ul>
+  </section>
+
+  <section id="food" aria-labelledby="h-food">
+    <div class="sec-head"><h2 id="h-food">غذا</h2><span class="en">Food</span></div>
+    <ul class="items">
+      <li><span class="item-name">سیب‌زمینی</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">سیب ویژه</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">اسنک</span><span class="dots"></span><span class="price"></span></li>
+      <li><span class="item-name">چیپس و پنیر</span><span class="dots"></span><span class="price"></span></li>
+    </ul>
+  </section>
+
+  <section id="ghelyan" aria-labelledby="h-ghelyan">
+    <div class="sec-head"><h2 id="h-ghelyan">قلیان</h2><span class="en">Hookah</span></div>
+    <div class="card">
+      <ul class="items">
+        <li><span class="item-name">آدامس دارچین</span><span class="dots"></span><span class="price"></span></li>
+        <li><span class="item-name">لاو</span><span class="dots"></span><span class="price"></span></li>
+        <li><span class="item-name">هندوانه یخ</span><span class="dots"></span><span class="price"></span></li>
+        <li><span class="item-name">پرتقال خامه</span><span class="dots"></span><span class="price"></span></li>
+        <li><span class="item-name">بلوبری</span><span class="dots"></span><span class="price"></span></li>
+        <li><span class="item-name">شب‌های مسکو</span><span class="dots"></span><span class="price"></span></li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="notes">
+    <p><strong>توجه:</strong> از ساعت ۱۲ شب به بعد مبلغی به سفارش اضافه می‌شود.</p>
+    <p><strong>تخته و بازی‌های گروهی:</strong> مدت زمان میز در تایم پیک ۲۰ دقیقه است.</p>
+  </div>
+
+</main>
+
+<footer>
+  <div class="brand">کافه خوارزم</div>
+  <div>cafekharazm.com</div>
+</footer>
+
+<script>
+  // scroll-spy: highlight the active category pill
+  const links = document.querySelectorAll(".nav-inner a");
+  const sections = document.querySelectorAll("main section");
+
+  const spy = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((a) => a.classList.toggle(
+          "active",
+          a.getAttribute("href") === "#" + entry.target.id
+        ));
+      });
+    },
+    { rootMargin: "-40% 0px -55% 0px" }
+  );
+  sections.forEach((s) => spy.observe(s));
+
+  // keep the active pill visible in the horizontal nav
+  links.forEach((a) =>
+    a.addEventListener("click", () =>
+      a.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" })
+    )
+  );
+</script>
+
+</body>
+</html>
