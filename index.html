@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>منوی کافه خوارزم | Coffe Sam</title>
 <meta name="description" content="منوی کافه خوارزم — چای، دمنوش، کافی، آب‌میوه، غذا و قلیان" />
 <meta name="theme-color" content="#0b0908" />
@@ -20,6 +20,13 @@
     --text: #efe7d8;
     --muted: #a3937d;
     --radius: 14px;
+
+    /* liquid glass */
+    --glass-tint: rgba(28, 22, 16, 0.55);
+    --glass-sheen: rgba(255, 255, 255, 0.14);
+    --glass-edge: rgba(255, 255, 255, 0.10);
+
+    --tray-h: 0px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,6 +41,46 @@
     line-height: 1.8;
     -webkit-font-smoothing: antialiased;
     min-height: 100dvh;
+    overflow-x: hidden;
+  }
+  body.sheet-open { overflow: hidden; }
+
+  ::selection { background: var(--ember); color: #14100a; }
+
+  :focus-visible {
+    outline: 2px solid var(--ember);
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+
+  /* ---------- shared liquid-glass surface ---------- */
+  .glass {
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02)),
+      var(--glass-tint);
+    backdrop-filter: blur(22px) saturate(190%);
+    -webkit-backdrop-filter: blur(22px) saturate(190%);
+    border: 1px solid var(--glass-edge);
+    box-shadow:
+      inset 0 1px 0 var(--glass-sheen),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+      0 14px 44px rgba(0, 0, 0, 0.55);
+  }
+  /* specular top-edge highlight — the thing that reads as "liquid" */
+  .glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      170deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.03) 22%,
+      transparent 46%
+    );
+    mix-blend-mode: screen;
   }
 
   /* ---------- hero ---------- */
@@ -52,6 +99,7 @@
       rgba(217, 160, 63, 0.16), transparent 70%);
     pointer-events: none;
   }
+  .hero > * { position: relative; }
   .hero .eyebrow {
     font-size: 12px;
     letter-spacing: 0.35em;
@@ -66,6 +114,7 @@
     line-height: 1.15;
     margin-top: 10px;
     color: var(--text);
+    text-wrap: balance;
   }
   .hero h1 span { color: var(--ember); }
   .hero p {
@@ -93,56 +142,112 @@
     box-shadow: 0 0 18px 2px rgba(217, 160, 63, 0.45);
   }
 
-  /* ---------- sticky nav ---------- */
+  /* ---------- sticky liquid-glass nav ---------- */
   nav {
     position: sticky;
     top: 0;
-    z-index: 10;
-    background: rgba(11, 9, 8, 0.88);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--line);
+    z-index: 30;
+    padding: 10px 12px calc(10px + env(safe-area-inset-top, 0px));
   }
-  .nav-inner {
-    display: flex;
-    gap: 8px;
-    padding: 12px 16px;
-    overflow-x: auto;
-    scrollbar-width: none;
+  .nav-shell {
     max-width: 720px;
     margin-inline: auto;
+    border-radius: 22px;
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    overflow: hidden;
   }
-  .nav-inner::-webkit-scrollbar { display: none; }
-  .nav-inner a {
+  .nav-track {
+    position: relative;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-track::-webkit-scrollbar { display: none; }
+
+  .nav-pill {
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: 0;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #e8b457, var(--ember));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      0 4px 18px rgba(217, 160, 63, 0.42);
+    transform: translateX(0);
+    transition: transform .42s cubic-bezier(.32, 1.32, .42, 1), width .42s cubic-bezier(.32, 1.32, .42, 1);
+    pointer-events: none;
+    opacity: 0;
+  }
+  .nav-pill.ready { opacity: 1; }
+
+  .nav-track a {
+    position: relative;
     flex: 0 0 auto;
     text-decoration: none;
     color: var(--muted);
     font-size: 14px;
     font-weight: 400;
-    padding: 7px 16px;
-    border: 1px solid var(--line);
+    padding: 8px 17px;
     border-radius: 999px;
-    transition: color .25s, border-color .25s, background .25s, box-shadow .25s;
+    white-space: nowrap;
+    transition: color .3s ease;
   }
-  .nav-inner a:focus-visible {
-    outline: 2px solid var(--ember);
-    outline-offset: 2px;
+  .nav-track a.active { color: #120d06; font-weight: 500; }
+
+  .nav-search {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 12px;
+    height: 38px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.07);
   }
-  .nav-inner a.active {
-    color: #120d06;
-    background: var(--ember);
-    border-color: var(--ember);
-    box-shadow: 0 0 16px rgba(217, 160, 63, 0.35);
-    font-weight: 500;
+  .nav-search svg { flex: 0 0 auto; color: var(--muted); }
+  .nav-search input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 300;
+    appearance: none;
+    -webkit-appearance: none;
   }
+  .nav-search input::-webkit-search-cancel-button,
+  .nav-search input::-webkit-search-decoration { display: none; }
+  .nav-search input::placeholder { color: var(--muted); opacity: .75; }
+  .nav-search input:focus { outline: none; }
+  .nav-search button {
+    flex: 0 0 auto;
+    border: none;
+    background: none;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+    visibility: hidden;
+  }
+  .nav-search.filled button { visibility: visible; }
 
   /* ---------- sections ---------- */
   main {
     max-width: 720px;
     margin-inline: auto;
-    padding: 12px 20px 40px;
+    padding: 12px 20px 24px;
   }
-  section { padding-top: 34px; scroll-margin-top: 70px; }
+  section { padding-top: 34px; scroll-margin-top: 116px; }
+  section[hidden] { display: none; }
 
   .sec-head { display: flex; align-items: baseline; gap: 14px; }
   .sec-head h2 {
@@ -166,28 +271,107 @@
     opacity: .6;
   }
 
-  ul.items { list-style: none; margin-top: 14px; }
+  ul.items { list-style: none; margin-top: 10px; }
   ul.items li {
     display: flex;
-    align-items: baseline;
-    gap: 10px;
-    padding: 13px 4px;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 4px;
     border-bottom: 1px dashed var(--line);
     font-size: 16.5px;
+    transition: opacity .2s ease;
   }
   ul.items li:last-child { border-bottom: none; }
-  .item-name { font-weight: 400; }
+  ul.items li[hidden] { display: none; }
+
+  /* thumbnail */
+  .thumb {
+    flex: 0 0 auto;
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(circle at 32% 24%, rgba(217, 160, 63, 0.20), transparent 62%),
+      linear-gradient(160deg, var(--surface-2), #100c07);
+    border: 1px solid var(--line);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    color: var(--ember);
+    overflow: hidden;
+  }
+  .thumb svg { width: 38px; height: 38px; display: block; }
+
+  .item-body { flex: 1; min-width: 0; }
+  .item-name { font-weight: 400; display: block; }
   .item-desc {
     color: var(--muted);
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 300;
+    display: block;
+    line-height: 1.5;
   }
-  .dots { flex: 1; }
   .price {
     color: var(--muted);
     font-size: 14px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+  }
+  .price:empty { display: none; }
+
+  /* add / stepper control */
+  .ctl { flex: 0 0 auto; display: flex; align-items: center; }
+  .add {
+    width: 34px; height: 34px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--ember);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: transform .18s ease, background .25s, border-color .25s, color .25s;
+  }
+  .add:hover { background: var(--ember); border-color: var(--ember); color: #14100a; }
+  .add:active { transform: scale(.88); }
+
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 999px;
+    background: rgba(217, 160, 63, 0.12);
+    border: 1px solid rgba(217, 160, 63, 0.30);
+  }
+  .stepper button {
+    width: 28px; height: 28px;
+    border-radius: 999px;
+    border: none;
+    background: none;
+    color: var(--ember);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background .2s;
+  }
+  .stepper button:hover { background: rgba(217, 160, 63, 0.20); }
+  .qty {
+    min-width: 22px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  li.picked .thumb {
+    border-color: rgba(217, 160, 63, 0.55);
+    box-shadow: 0 0 0 1px rgba(217, 160, 63, 0.20), 0 0 20px rgba(217, 160, 63, 0.14);
   }
 
   /* hookah card gets a quiet frame of its own */
@@ -196,15 +380,209 @@
     background: linear-gradient(180deg, var(--surface-2), var(--surface));
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 6px 18px;
+    padding: 6px 14px;
   }
   #ghelyan ul.items li { border-color: #342818; }
+
+  .empty-search {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    padding: 60px 0;
+  }
+  .empty-search[hidden] { display: none; }
+
+  /* ---------- order tray (glass) ---------- */
+  .tray {
+    position: fixed;
+    inset-inline: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    z-index: 40;
+    max-width: 696px;
+    margin-inline: auto;
+    border-radius: 20px;
+    padding: 10px 12px 10px 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transform: translateY(140%);
+    transition: transform .48s cubic-bezier(.3, 1.2, .4, 1);
+  }
+  .tray.show { transform: translateY(0); }
+  .tray-count {
+    flex: 0 0 auto;
+    min-width: 34px;
+    height: 34px;
+    padding-inline: 10px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #e8b457, var(--ember));
+    color: #14100a;
+    font-weight: 700;
+    font-size: 15px;
+    display: grid;
+    place-items: center;
+    font-variant-numeric: tabular-nums;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+  }
+  .tray-label { flex: 1; font-size: 15px; font-weight: 400; }
+  .tray-label small { display: block; color: var(--muted); font-size: 12px; line-height: 1.4; }
+  .tray-chev { flex: 0 0 auto; color: var(--muted); }
+
+  /* ---------- order sheet ---------- */
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(6, 5, 4, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+  }
+  .scrim.show { opacity: 1; pointer-events: auto; }
+
+  .sheet {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 60;
+    max-width: 720px;
+    margin-inline: auto;
+    border-radius: 26px 26px 0 0;
+    border-bottom: none;
+    padding: 10px 18px calc(18px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+    max-height: 82dvh;
+    transform: translateY(101%);
+    transition: transform .46s cubic-bezier(.3, 1.1, .4, 1);
+  }
+  .sheet.show { transform: translateY(0); }
+  .grabber {
+    width: 42px; height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
+    margin: 2px auto 12px;
+    flex: 0 0 auto;
+  }
+  .sheet-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    flex: 0 0 auto;
+  }
+  .sheet-head h3 {
+    font-family: "Lalezar", "Vazirmatn", sans-serif;
+    font-weight: 400;
+    font-size: 24px;
+    color: var(--ember);
+  }
+  .sheet-head .cnt { color: var(--muted); font-size: 13px; flex: 1; }
+  .sheet-head .clear {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 6px;
+    transition: color .2s;
+  }
+  .sheet-head .clear:hover { color: #e08b6a; }
+
+  .sheet-list {
+    list-style: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    flex: 1;
+    margin: 0;
+    padding: 4px 0;
+  }
+  .sheet-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 2px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .sheet-list li:last-child { border-bottom: none; }
+  .sheet-list .thumb { width: 44px; height: 44px; border-radius: 13px; }
+  .sheet-list .thumb svg { width: 30px; height: 30px; }
+  .sheet-list .nm { flex: 1; font-size: 15.5px; min-width: 0; }
+  .sheet-list .nm em {
+    display: block;
+    font-style: normal;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .sheet-empty {
+    padding: 48px 0 56px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .sheet-foot {
+    flex: 0 0 auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    gap: 9px;
+  }
+  .sheet-foot button {
+    flex: 1;
+    height: 46px;
+    border-radius: 14px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--text);
+    transition: background .25s, border-color .25s, transform .15s;
+  }
+  .sheet-foot button:active { transform: scale(.98); }
+  .sheet-foot .primary {
+    flex: 1.4;
+    border-color: transparent;
+    background: linear-gradient(180deg, #e8b457, var(--ember));
+    color: #14100a;
+    font-weight: 700;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 6px 22px rgba(217,160,63,.28);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    z-index: 70;
+    transform: translate(-50%, 16px);
+    padding: 10px 20px;
+    border-radius: 999px;
+    background: rgba(28, 22, 16, 0.88);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid var(--glass-edge);
+    color: var(--text);
+    font-size: 13.5px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .28s ease, transform .28s ease;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
   /* ---------- footer ---------- */
   footer {
     text-align: center;
-    padding: 28px 20px 40px;
+    padding: 28px 20px calc(40px + var(--tray-h));
     color: var(--muted);
+    transition: padding-bottom .4s ease;
     font-size: 12px;
   }
   footer .brand {
@@ -213,9 +591,13 @@
     color: var(--ember);
   }
 
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass { background: rgba(20, 15, 10, 0.97); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    * { transition: none !important; }
+    *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
   }
 </style>
 </head>
@@ -230,13 +612,16 @@
 </header>
 
 <nav aria-label="دسته‌بندی منو">
-  <div class="nav-inner">
-    <a href="#chai" class="active">چای</a>
-    <a href="#damnush">دمنوش</a>
-    <a href="#coffee">کافی</a>
-    <a href="#juice">آب‌میوه</a>
-    <a href="#food">غذا</a>
-    <a href="#ghelyan">قلیان</a>
+  <div class="nav-shell glass">
+    <div class="nav-track">
+      <span class="nav-pill" aria-hidden="true"></span>
+      <a href="#chai" class="active">چای</a>
+      <a href="#damnush">دمنوش</a>
+      <a href="#coffee">کافی</a>
+      <a href="#juice">آب‌میوه</a>
+      <a href="#food">غذا</a>
+      <a href="#ghelyan">قلیان</a>
+    </div>
   </div>
 </nav>
 
@@ -245,62 +630,62 @@
   <section id="chai" aria-labelledby="h-chai">
     <div class="sec-head"><h2 id="h-chai">چای</h2><span class="en">Tea</span></div>
     <ul class="items">
-      <li><span class="item-name">چای دمی</span><span class="item-desc">بهار نارنج، گل سرخ، هل</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">چای زعفران</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">چای دارچین</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">چای ماسالا</span><span class="dots"></span><span class="price"></span></li>
+      <li data-ic="teapot"><span class="item-name">چای دمی</span><span class="item-desc">بهار نارنج، گل سرخ، هل</span><span class="price"></span></li>
+      <li data-ic="teaglass"><span class="item-name">چای زعفران</span><span class="price"></span></li>
+      <li data-ic="teaglass"><span class="item-name">چای دارچین</span><span class="price"></span></li>
+      <li data-ic="masala"><span class="item-name">چای ماسالا</span><span class="price"></span></li>
     </ul>
   </section>
 
   <section id="damnush" aria-labelledby="h-damnush">
     <div class="sec-head"><h2 id="h-damnush">دمنوش</h2><span class="en">Herbal</span></div>
     <ul class="items">
-      <li><span class="item-name">دمنوش زعفران</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">دمنوش انرژی</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">بابونه</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">گل گاوزبان</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">چای ترش</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">بهار نارنج</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">سیب دارچین</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">استوایی</span><span class="dots"></span><span class="price"></span></li>
+      <li data-ic="herbal"><span class="item-name">دمنوش زعفران</span><span class="price"></span></li>
+      <li data-ic="herbal"><span class="item-name">دمنوش انرژی</span><span class="price"></span></li>
+      <li data-ic="flower"><span class="item-name">بابونه</span><span class="price"></span></li>
+      <li data-ic="flower"><span class="item-name">گل گاوزبان</span><span class="price"></span></li>
+      <li data-ic="hibiscus"><span class="item-name">چای ترش</span><span class="price"></span></li>
+      <li data-ic="flower"><span class="item-name">بهار نارنج</span><span class="price"></span></li>
+      <li data-ic="apple"><span class="item-name">سیب دارچین</span><span class="price"></span></li>
+      <li data-ic="tropical"><span class="item-name">استوایی</span><span class="price"></span></li>
     </ul>
   </section>
 
   <section id="coffee" aria-labelledby="h-coffee">
     <div class="sec-head"><h2 id="h-coffee">کافی</h2><span class="en">Coffee</span></div>
     <ul class="items">
-      <li><span class="item-name">اسپرسو</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">آمریکانو</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">لته</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">آیس آمریکانو</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">آیس لته</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">آیس موکا</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">آیس کارامل ماکیاتو</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">کاپوچینو</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">هات چاکلت</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">علی کافه</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">نسکافه</span><span class="dots"></span><span class="price"></span></li>
+      <li data-ic="espresso"><span class="item-name">اسپرسو</span><span class="price"></span></li>
+      <li data-ic="americano"><span class="item-name">آمریکانو</span><span class="price"></span></li>
+      <li data-ic="latte"><span class="item-name">لته</span><span class="price"></span></li>
+      <li data-ic="iced"><span class="item-name">آیس آمریکانو</span><span class="price"></span></li>
+      <li data-ic="iced"><span class="item-name">آیس لته</span><span class="price"></span></li>
+      <li data-ic="iced"><span class="item-name">آیس موکا</span><span class="price"></span></li>
+      <li data-ic="iced"><span class="item-name">آیس کارامل ماکیاتو</span><span class="price"></span></li>
+      <li data-ic="latte"><span class="item-name">کاپوچینو</span><span class="price"></span></li>
+      <li data-ic="cocoa"><span class="item-name">هات چاکلت</span><span class="price"></span></li>
+      <li data-ic="americano"><span class="item-name">علی کافه</span><span class="price"></span></li>
+      <li data-ic="americano"><span class="item-name">نسکافه</span><span class="price"></span></li>
     </ul>
   </section>
 
   <section id="juice" aria-labelledby="h-juice">
     <div class="sec-head"><h2 id="h-juice">آب‌میوه</h2><span class="en">Juice</span></div>
     <ul class="items">
-      <li><span class="item-name">آب هندوانه</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">آب طالبی</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">شیرموز</span><span class="dots"></span><span class="price"></span></li>
+      <li data-ic="juice"><span class="item-name">آب هندوانه</span><span class="price"></span></li>
+      <li data-ic="juice"><span class="item-name">آب طالبی</span><span class="price"></span></li>
+      <li data-ic="shake"><span class="item-name">شیرموز</span><span class="price"></span></li>
     </ul>
   </section>
 
   <section id="food" aria-labelledby="h-food">
     <div class="sec-head"><h2 id="h-food">غذا</h2><span class="en">Food</span></div>
     <ul class="items">
-      <li><span class="item-name">سیب‌زمینی</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">سیب ویژه</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">اسنک</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">چیپس و پنیر</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">کیک شکلاتی</span><span class="dots"></span><span class="price"></span></li>
-      <li><span class="item-name">کوکی رژیمی</span><span class="dots"></span><span class="price"></span></li>
+      <li data-ic="fries"><span class="item-name">سیب‌زمینی</span><span class="price"></span></li>
+      <li data-ic="fries"><span class="item-name">سیب ویژه</span><span class="price"></span></li>
+      <li data-ic="snack"><span class="item-name">اسنک</span><span class="price"></span></li>
+      <li data-ic="nachos"><span class="item-name">چیپس و پنیر</span><span class="price"></span></li>
+      <li data-ic="cake"><span class="item-name">کیک شکلاتی</span><span class="price"></span></li>
+      <li data-ic="cookie"><span class="item-name">کوکی رژیمی</span><span class="price"></span></li>
     </ul>
   </section>
 
@@ -308,15 +693,17 @@
     <div class="sec-head"><h2 id="h-ghelyan">قلیان</h2><span class="en">Hookah</span></div>
     <div class="card">
       <ul class="items">
-        <li><span class="item-name">آدامس دارچین</span><span class="dots"></span><span class="price"></span></li>
-        <li><span class="item-name">لاو</span><span class="dots"></span><span class="price"></span></li>
-        <li><span class="item-name">هندوانه یخ</span><span class="dots"></span><span class="price"></span></li>
-        <li><span class="item-name">پرتقال خامه</span><span class="dots"></span><span class="price"></span></li>
-        <li><span class="item-name">بلوبری</span><span class="dots"></span><span class="price"></span></li>
-        <li><span class="item-name">شب‌های مسکو</span><span class="dots"></span><span class="price"></span></li>
+        <li data-ic="hookah"><span class="item-name">آدامس دارچین</span><span class="price"></span></li>
+        <li data-ic="hookah"><span class="item-name">لاو</span><span class="price"></span></li>
+        <li data-ic="hookah"><span class="item-name">هندوانه یخ</span><span class="price"></span></li>
+        <li data-ic="hookah"><span class="item-name">پرتقال خامه</span><span class="price"></span></li>
+        <li data-ic="hookah"><span class="item-name">بلوبری</span><span class="price"></span></li>
+        <li data-ic="hookah"><span class="item-name">شب‌های مسکو</span><span class="price"></span></li>
       </ul>
     </div>
   </section>
+
+  <p class="empty-search" id="no-results" hidden>چیزی با این نام پیدا نشد.</p>
 
 </main>
 
@@ -324,31 +711,568 @@
   <div class="brand">کافه خوارزم</div>
 </footer>
 
+<!-- order tray -->
+<div class="tray glass" id="tray" role="button" tabindex="0" aria-controls="sheet" aria-expanded="false">
+  <span class="tray-count" id="tray-count">۰</span>
+  <span class="tray-label">سفارش من<small id="tray-sub">مشاهده و ثبت لیست</small></span>
+  <svg class="tray-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6" /></svg>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<aside class="sheet glass" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" aria-hidden="true">
+  <div class="grabber" aria-hidden="true"></div>
+  <div class="sheet-head">
+    <h3 id="sheet-title">سفارش من</h3>
+    <span class="cnt" id="sheet-cnt"></span>
+    <button type="button" class="clear" id="clear-all">حذف همه</button>
+  </div>
+  <ul class="sheet-list" id="sheet-list"></ul>
+  <p class="sheet-empty" id="sheet-empty">هنوز چیزی انتخاب نکرده‌اید.<br />از منو با دکمهٔ + اضافه کنید.</p>
+  <div class="sheet-foot">
+    <button type="button" id="close-btn">بستن</button>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script>
-  // scroll-spy: highlight the active category pill
-  const links = document.querySelectorAll(".nav-inner a");
-  const sections = document.querySelectorAll("main section");
+(function () {
+  "use strict";
+
+  /* ---------------------------------------------------------------
+     1. illustrations — inline SVG, no network, drawn in one line
+        weight so they read as a single family at 38px
+  --------------------------------------------------------------- */
+  const S = (body) =>
+    '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.1" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + body + "</svg>";
+
+  const F = 'fill="currentColor" fill-opacity=".16"';
+
+  const ICONS = {
+    teapot: S(
+      '<path ' + F + ' d="M16 30h26a3 3 0 0 1 3 3v3a13 13 0 0 1-13 13h-6A13 13 0 0 1 13 36v-3a3 3 0 0 1 3-3Z"/>' +
+      '<path d="M45 34h5a4 4 0 0 1 4 4v2"/><path d="M25 30a4 4 0 0 1 8 0"/>' +
+      '<path d="M29 24v-3"/><path d="M13 52h32"/>' +
+      '<path d="M22 17c0-3 3-3 3-6"/><path d="M34 17c0-3 3-3 3-6"/>'
+    ),
+    teaglass: S(
+      '<path ' + F + ' d="M21 13h22l-5 17 5 18H21l-5-18Z"/>' +
+      '<path d="M18 40h28"/><path d="M14 54h36"/>'
+    ),
+    masala: S(
+      '<path ' + F + ' d="M17 25h24l-3 20a4 4 0 0 1-4 3H24a4 4 0 0 1-4-3Z"/>' +
+      '<path d="M41 29h4a5 5 0 0 1 0 10h-3"/><path d="M13 53h32"/>' +
+      '<path d="M24 19c0-3 3-3 3-6"/><path d="M32 19c0-3 3-3 3-6"/>' +
+      '<circle cx="26" cy="33" r="1.4" fill="currentColor" stroke="none"/>' +
+      '<circle cx="33" cy="37" r="1.4" fill="currentColor" stroke="none"/>'
+    ),
+    herbal: S(
+      '<path ' + F + ' d="M17 27h24l-3 18a4 4 0 0 1-4 3H24a4 4 0 0 1-4-3Z"/>' +
+      '<path d="M41 31h4a5 5 0 0 1 0 10h-3"/><path d="M13 53h32"/>' +
+      '<path d="M29 22c-6 0-9-4-8-9 6-1 10 2 10 6"/><path d="M21 13c5 4 8 6 10 9"/>'
+    ),
+    flower: S(
+      '<path ' + F + ' d="M17 29h24l-3 17a4 4 0 0 1-4 3H24a4 4 0 0 1-4-3Z"/>' +
+      '<path d="M41 33h4a5 5 0 0 1 0 9h-3"/><path d="M13 53h32"/>' +
+      '<circle cx="29" cy="16" r="4" ' + F + '/>' +
+      '<path d="M29 12c3-4 8-2 7 2M29 20c-3 4-8 2-7-2M25 16c-4-3-2-8 2-7M33 16c4 3 2 8-2 7"/>'
+    ),
+    hibiscus: S(
+      '<path ' + F + ' d="M21 14h22l-5 17 5 18H21l-5-18Z"/>' +
+      '<path d="M18 41h28"/><path d="M14 55h36"/>' +
+      '<path d="M28 22c0-3 2-5 4-5s4 2 4 5-2 5-4 5-4-2-4-5Z" ' + F + '/>'
+    ),
+    apple: S(
+      '<path ' + F + ' d="M32 20c9-6 20 0 20 12s-9 22-14 22c-2 0-4-1-6-1s-4 1-6 1c-5 0-14-10-14-22s11-18 20-12Z"/>' +
+      '<path d="M32 20v-6c0-3 3-5 6-5"/><path d="M24 30c-2 2-3 5-3 8"/>'
+    ),
+    tropical: S(
+      '<path ' + F + ' d="M18 22h28l-4 26a5 5 0 0 1-5 4h-10a5 5 0 0 1-5-4Z"/>' +
+      '<path d="M14 22h36"/><path d="M40 18 50 8"/><path d="M32 30v18"/>' +
+      '<path d="M45 13a6 6 0 0 1 8 0 6 6 0 0 1-8 0Z" ' + F + '/>'
+    ),
+    espresso: S(
+      '<path ' + F + ' d="M18 26h22l-3 14a5 5 0 0 1-5 4h-6a5 5 0 0 1-5-4Z"/>' +
+      '<path d="M40 30h4a5 5 0 0 1 0 10h-3"/><path d="M13 50h34"/>' +
+      '<path d="M25 19c0-3 3-3 3-6"/><path d="M33 19c0-3 3-3 3-6"/>'
+    ),
+    americano: S(
+      '<path ' + F + ' d="M17 24h24v18a6 6 0 0 1-6 6h-12a6 6 0 0 1-6-6Z"/>' +
+      '<path d="M41 28h4a5 5 0 0 1 0 10h-4"/><path d="M13 53h33"/>' +
+      '<path d="M20 32h18"/>'
+    ),
+    latte: S(
+      '<path ' + F + ' d="M17 24h24v18a6 6 0 0 1-6 6h-12a6 6 0 0 1-6-6Z"/>' +
+      '<path d="M41 28h4a5 5 0 0 1 0 10h-4"/><path d="M13 53h33"/>' +
+      '<path d="M29 30c-4 0-6 2-6 4s3 4 6 4 6-2 6-5-3-6-6-6"/>'
+    ),
+    cocoa: S(
+      '<path ' + F + ' d="M17 24h24v18a6 6 0 0 1-6 6h-12a6 6 0 0 1-6-6Z"/>' +
+      '<path d="M41 28h4a5 5 0 0 1 0 10h-4"/><path d="M13 53h33"/>' +
+      '<circle cx="24" cy="29" r="2.2" fill="currentColor" stroke="none"/>' +
+      '<circle cx="32" cy="30" r="2.2" fill="currentColor" stroke="none"/>' +
+      '<path d="M22 17c0-3 3-3 3-6"/><path d="M33 17c0-3 3-3 3-6"/>'
+    ),
+    iced: S(
+      '<path ' + F + ' d="M20 20h24l-4 30a4 4 0 0 1-4 3h-8a4 4 0 0 1-4-3Z"/>' +
+      '<path d="M16 20h32"/><path d="M38 20 48 7"/>' +
+      '<rect x="25" y="28" width="8" height="8" rx="1.5"/>' +
+      '<rect x="33" y="38" width="7" height="7" rx="1.5"/>'
+    ),
+    juice: S(
+      '<path ' + F + ' d="M19 22h26l-4 28a4 4 0 0 1-4 3h-10a4 4 0 0 1-4-3Z"/>' +
+      '<path d="M15 22h34"/><path d="M32 32v18"/>' +
+      '<path d="M44 22a8 8 0 0 1-11 0 8 8 0 0 1 11 0Z" ' + F + '/>'
+    ),
+    shake: S(
+      '<path ' + F + ' d="M21 26h22l-4 24a4 4 0 0 1-4 3h-6a4 4 0 0 1-4-3Z"/>' +
+      '<path d="M18 26h28"/><path d="M40 26 49 12"/>' +
+      '<path d="M22 26c1-6 5-9 10-9s9 3 10 9" ' + F + '/>' +
+      '<circle cx="27" cy="14" r="2.5" fill="currentColor" stroke="none"/>'
+    ),
+    fries: S(
+      '<path ' + F + ' d="M19 30h26l-3 20a4 4 0 0 1-4 3H26a4 4 0 0 1-4-3Z"/>' +
+      '<path d="M19 38h26"/>' +
+      '<path d="M25 30V16"/><path d="M32 30V12"/><path d="M39 30V17"/>'
+    ),
+    snack: S(
+      '<path ' + F + ' d="M12 32a20 10 0 0 1 40 0Z"/>' +
+      '<path d="M11 32h42a3 3 0 0 1 0 6H11a3 3 0 0 1 0-6Z"/>' +
+      '<path ' + F + ' d="M14 38h36a18 8 0 0 1-36 0Z"/>' +
+      '<path d="M20 25h2M28 22h2M37 25h2"/>'
+    ),
+    nachos: S(
+      '<path ' + F + ' d="M13 32h38a19 17 0 0 1-38 0Z"/>' +
+      '<path d="M24 32 32 14l8 18Z" ' + F + '/>' +
+      '<path d="M18 30l6-11 5 13"/>' +
+      '<path d="M20 38c4 3 20 3 24 0"/>'
+    ),
+    cake: S(
+      '<path ' + F + ' d="M16 30h32v14a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4Z"/>' +
+      '<path d="M16 38h32"/>' +
+      '<path d="M16 30c0-4 7-6 16-6s16 2 16 6"/>' +
+      '<path d="M32 24v-6"/><circle cx="32" cy="15" r="3" ' + F + '/>'
+    ),
+    cookie: S(
+      '<circle cx="32" cy="32" r="18" ' + F + '/>' +
+      '<circle cx="26" cy="26" r="2.3" fill="currentColor" stroke="none"/>' +
+      '<circle cx="37" cy="30" r="2.3" fill="currentColor" stroke="none"/>' +
+      '<circle cx="28" cy="39" r="2.3" fill="currentColor" stroke="none"/>' +
+      '<circle cx="39" cy="40" r="1.8" fill="currentColor" stroke="none"/>'
+    ),
+    hookah: S(
+      '<path ' + F + ' d="M25 40a7 7 0 0 1 14 0v4a7 7 0 0 1-14 0Z"/>' +
+      '<path d="M32 40V18"/><path d="M27 18h10l-2 5h-6Z" ' + F + '/>' +
+      '<path d="M32 14v-2"/><path d="M20 52h24"/>' +
+      '<path d="M32 30c-8 0-12 4-12 10 0 4 3 6 6 6"/>'
+    )
+  };
+
+  /* ---------------------------------------------------------------
+     2. build rows: thumbnail + add control
+  --------------------------------------------------------------- */
+  const faNum = (n) => Number(n).toLocaleString("fa-IR");
+  const rows = Array.from(document.querySelectorAll("main ul.items li"));
+
+  rows.forEach((li, i) => {
+    const id = "i" + i;
+    li.dataset.id = id;
+
+    const nameEl = li.querySelector(".item-name");
+    const descEl = li.querySelector(".item-desc");
+    const priceEl = li.querySelector(".price");
+    const name = nameEl.textContent.trim();
+    li.dataset.name = name;
+    li.dataset.section = li.closest("section").querySelector(".sec-head h2").textContent.trim();
+
+    const thumb = document.createElement("span");
+    thumb.className = "thumb";
+    thumb.setAttribute("aria-hidden", "true");
+    thumb.innerHTML = ICONS[li.dataset.ic] || ICONS.teaglass;
+
+    const body = document.createElement("span");
+    body.className = "item-body";
+    body.appendChild(nameEl);
+    if (descEl) body.appendChild(descEl);
+
+    const ctl = document.createElement("span");
+    ctl.className = "ctl";
+    const add = document.createElement("button");
+    add.type = "button";
+    add.className = "add";
+    add.textContent = "+";
+    add.setAttribute("aria-label", "افزودن " + name + " به سفارش");
+    ctl.appendChild(add);
+
+    li.textContent = "";
+    li.append(thumb, body, priceEl, ctl);
+
+    add.addEventListener("click", () => change(id, +1));
+  });
+
+  const byId = new Map(rows.map((li) => [li.dataset.id, li]));
+
+  /* ---------------------------------------------------------------
+     3. order state
+  --------------------------------------------------------------- */
+  const KEY = "kharazm-order-v1";
+  let order = {};
+  try {
+    order = JSON.parse(localStorage.getItem(KEY) || "{}") || {};
+  } catch (e) { order = {}; }
+  // drop ids that no longer exist in the menu
+  Object.keys(order).forEach((id) => { if (!byId.has(id)) delete order[id]; });
+
+  const totalCount = () => Object.values(order).reduce((a, b) => a + b, 0);
+
+  function change(id, delta) {
+    const next = (order[id] || 0) + delta;
+    if (next <= 0) delete order[id];
+    else order[id] = Math.min(next, 99);
+    save();
+    renderRow(id);
+    renderTray();
+    if (sheet.classList.contains("show")) renderSheet();
+    if (delta > 0) toast(byId.get(id).dataset.name + " اضافه شد");
+  }
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(order)); } catch (e) { /* private mode */ }
+  }
+
+  function renderRow(id) {
+    const li = byId.get(id);
+    if (!li) return;
+    const ctl = li.querySelector(".ctl");
+    const qty = order[id] || 0;
+    li.classList.toggle("picked", qty > 0);
+    ctl.textContent = "";
+
+    if (!qty) {
+      const add = document.createElement("button");
+      add.type = "button";
+      add.className = "add";
+      add.textContent = "+";
+      add.setAttribute("aria-label", "افزودن " + li.dataset.name + " به سفارش");
+      add.addEventListener("click", () => change(id, +1));
+      ctl.appendChild(add);
+      return;
+    }
+
+    const box = document.createElement("span");
+    box.className = "stepper";
+    const minus = document.createElement("button");
+    minus.type = "button";
+    minus.textContent = "−";
+    minus.setAttribute("aria-label", "کم کردن " + li.dataset.name);
+    minus.addEventListener("click", () => change(id, -1));
+    const n = document.createElement("span");
+    n.className = "qty";
+    n.textContent = faNum(qty);
+    const plus = document.createElement("button");
+    plus.type = "button";
+    plus.textContent = "+";
+    plus.setAttribute("aria-label", "افزودن " + li.dataset.name);
+    plus.addEventListener("click", () => change(id, +1));
+    box.append(minus, n, plus);
+    ctl.appendChild(box);
+  }
+
+  /* ---------------------------------------------------------------
+     4. tray + sheet
+  --------------------------------------------------------------- */
+  /* Every lookup below is optional: deleting a chunk of markup should never
+     take the rest of the menu down with it. */
+  const $ = (id) => document.getElementById(id);
+  const on = (el, ev, fn) => { if (el) el.addEventListener(ev, fn); };
+
+  const tray = $("tray");
+  const trayCount = $("tray-count");
+  const traySub = $("tray-sub");
+  const sheet = $("sheet");
+  const scrim = $("scrim");
+  const list = $("sheet-list");
+  const sheetEmpty = $("sheet-empty");
+  const sheetCnt = $("sheet-cnt");
+  const sheetOpen = () => !!sheet && sheet.classList.contains("show");
+
+  function renderTray() {
+    const n = totalCount();
+    const kinds = Object.keys(order).length;
+    if (trayCount) trayCount.textContent = faNum(n);
+    if (traySub) traySub.textContent = kinds ? faNum(kinds) + " قلم · " + faNum(n) + " عدد" : "مشاهده و ثبت لیست";
+    if (tray) tray.classList.toggle("show", n > 0 || sheetOpen());
+    document.documentElement.style.setProperty("--tray-h", n > 0 ? "78px" : "0px");
+  }
+
+  function renderSheet() {
+    if (!list) return;
+    list.textContent = "";
+    const ids = Object.keys(order);
+    if (sheetEmpty) sheetEmpty.hidden = ids.length > 0;
+    if (sheetCnt) sheetCnt.textContent = ids.length ? faNum(totalCount()) + " عدد" : "";
+
+    ids.forEach((id) => {
+      const src = byId.get(id);
+      const li = document.createElement("li");
+
+      const thumb = document.createElement("span");
+      thumb.className = "thumb";
+      thumb.setAttribute("aria-hidden", "true");
+      thumb.innerHTML = ICONS[src.dataset.ic] || ICONS.teaglass;
+
+      const nm = document.createElement("span");
+      nm.className = "nm";
+      nm.textContent = src.dataset.name;
+      const sub = document.createElement("em");
+      sub.textContent = src.dataset.section;
+      nm.appendChild(sub);
+
+      const box = document.createElement("span");
+      box.className = "stepper";
+      const minus = document.createElement("button");
+      minus.type = "button";
+      minus.textContent = "−";
+      minus.setAttribute("aria-label", "کم کردن " + src.dataset.name);
+      minus.addEventListener("click", () => change(id, -1));
+      const n = document.createElement("span");
+      n.className = "qty";
+      n.textContent = faNum(order[id]);
+      const plus = document.createElement("button");
+      plus.type = "button";
+      plus.textContent = "+";
+      plus.setAttribute("aria-label", "افزودن " + src.dataset.name);
+      plus.addEventListener("click", () => change(id, +1));
+      box.append(minus, n, plus);
+
+      li.append(thumb, nm, box);
+      list.appendChild(li);
+    });
+  }
+
+  let lastFocus = null;
+
+  function openSheet() {
+    if (!sheet) return;
+    lastFocus = document.activeElement;
+    renderSheet();
+    sheet.classList.add("show");
+    if (scrim) scrim.classList.add("show");
+    sheet.setAttribute("aria-hidden", "false");
+    if (tray) tray.setAttribute("aria-expanded", "true");
+    document.body.classList.add("sheet-open");
+    const closeBtn = $("close-btn");
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeSheet() {
+    if (!sheet) return;
+    sheet.classList.remove("show");
+    if (scrim) scrim.classList.remove("show");
+    sheet.setAttribute("aria-hidden", "true");
+    if (tray) tray.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("sheet-open");
+    renderTray();
+    if (lastFocus && lastFocus.isConnected) lastFocus.focus();
+  }
+
+  on(tray, "click", openSheet);
+  on(tray, "keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openSheet(); }
+  });
+  on(scrim, "click", closeSheet);
+  on($("close-btn"), "click", closeSheet);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && sheetOpen()) closeSheet();
+  });
+
+  on($("clear-all"), "click", () => {
+    const ids = Object.keys(order);
+    if (!ids.length) return;
+    order = {};
+    save();
+    ids.forEach(renderRow);
+    renderSheet();
+    renderTray();
+    toast("سفارش خالی شد");
+  });
+
+  /* order as plain text — copy or native share */
+  function orderText() {
+    const lines = ["سفارش من — کافه خوارزم", ""];
+    Object.keys(order).forEach((id) => {
+      lines.push("• " + byId.get(id).dataset.name + " × " + faNum(order[id]));
+    });
+    lines.push("", "مجموع: " + faNum(totalCount()) + " عدد");
+    return lines.join("\n");
+  }
+
+  on($("share-btn"), "click", async () => {
+    if (!Object.keys(order).length) { toast("سفارش خالی است"); return; }
+    const text = orderText();
+    if (navigator.share) {
+      try { await navigator.share({ title: "سفارش من", text: text }); return; }
+      catch (e) { if (e && e.name === "AbortError") return; }
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      toast("سفارش کپی شد — برای گارسون بفرستید");
+    } catch (e) {
+      toast("کپی نشد؛ لطفاً لیست را دستی یادداشت کنید");
+    }
+  });
+
+  const toastEl = $("toast");
+  let toastTimer;
+  function toast(msg) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1800);
+  }
+
+  /* ---------------------------------------------------------------
+     5. nav — morphing glass pill + scroll spy
+  --------------------------------------------------------------- */
+  const track = document.querySelector(".nav-track");
+  const pill = track ? track.querySelector(".nav-pill") : null;
+  const q = $("q");
+  const noResults = $("no-results");
+
+  // Drop any category chip whose section was deleted from the menu, and any
+  // section left with no items — so editing the menu can never leave a dead chip.
+  const sections = Array.from(document.querySelectorAll("main section")).filter((sec) => {
+    if (sec.querySelector("ul.items li")) return true;
+    sec.remove();
+    return false;
+  });
+
+  const links = (track ? Array.from(track.querySelectorAll("a")) : []).filter((a) => {
+    const target = a.getAttribute("href").slice(1);
+    if (sections.some((s) => s.id === target)) return true;
+    a.remove();
+    return false;
+  });
+
+  let term = "";
+
+  function movePill(a) {
+    if (!a || !pill) return;
+    pill.style.width = a.offsetWidth + "px";
+    pill.style.transform = "translateX(" + a.offsetLeft + "px)";
+    pill.classList.add("ready");
+  }
+
+  /* Keep the active chip visible by scrolling the nav strip itself. Using
+     scrollIntoView here would also nudge the page, which re-fires the observer
+     below and the two chase each other until the tab locks up. */
+  function centerChip(a) {
+    if (!track || track.scrollWidth <= track.clientWidth) return;
+    track.scrollTo({
+      left: a.offsetLeft - (track.clientWidth - a.offsetWidth) / 2,
+      behavior: "smooth"
+    });
+  }
+
+  function setActive(a) {
+    if (!a) return;
+    links.forEach((l) => l.classList.toggle("active", l === a));
+    movePill(a);
+    centerChip(a);
+  }
+
+  // Tapping a category scrolls to it; every section stays on the page.
+  let jumping = 0;
+  links.forEach((a) =>
+    a.addEventListener("click", (e) => {
+      const target = document.getElementById(a.getAttribute("href").slice(1));
+      if (!target) return;
+      e.preventDefault();
+      setActive(a);
+      // Ignore the observer while the smooth scroll flies past other sections.
+      clearTimeout(jumping);
+      jumping = setTimeout(() => { jumping = 0; }, 700);
+      target.scrollIntoView({ block: "start", behavior: "smooth" });
+    })
+  );
 
   const spy = new IntersectionObserver(
     (entries) => {
+      if (term || jumping) return;
       entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        links.forEach((a) => a.classList.toggle(
-          "active",
-          a.getAttribute("href") === "#" + entry.target.id
-        ));
+        if (!entry.isIntersecting || entry.target.hidden) return;
+        const a = links.find((l) => l.getAttribute("href") === "#" + entry.target.id);
+        if (a && !a.classList.contains("active")) setActive(a);
       });
     },
-    { rootMargin: "-40% 0px -55% 0px" }
+    { rootMargin: "-45% 0px -50% 0px" }
   );
   sections.forEach((s) => spy.observe(s));
 
-  // keep the active pill visible in the horizontal nav
-  links.forEach((a) =>
-    a.addEventListener("click", () =>
-      a.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" })
-    )
+  /* ---------------------------------------------------------------
+     6. search
+  --------------------------------------------------------------- */
+
+  // normalize Arabic/Persian variants so "کافي" matches "کافی"
+  const norm = (s) =>
+    s.replace(/[يیۍ]/g, "ی").replace(/[كک]/g, "ک").replace(/[أإآا]/g, "ا")
+     .replace(/[ً-ْ‌‏\s‌]/g, "").toLowerCase();
+
+  function render() {
+    const searching = term.length > 0;
+    let hits = 0;
+
+    sections.forEach((sec) => {
+      let visible = 0;
+      sec.querySelectorAll("ul.items li").forEach((li) => {
+        const desc = li.querySelector(".item-desc");
+        const hay = norm(li.dataset.name + " " + (desc ? desc.textContent : ""));
+        const show = !searching || hay.indexOf(term) !== -1;
+        li.hidden = !show;
+        if (show) visible++;
+      });
+      sec.hidden = visible === 0;
+      hits += visible;
+    });
+
+    if (noResults) noResults.hidden = hits > 0;
+  }
+
+  // The search field is optional — the menu works with or without it.
+  if (q) {
+    q.addEventListener("input", () => {
+      term = norm(q.value.trim());
+      q.parentElement.classList.toggle("filled", q.value.length > 0);
+      render();
+    });
+    const qClear = document.getElementById("q-clear");
+    if (qClear) {
+      qClear.addEventListener("click", () => {
+        q.value = "";
+        term = "";
+        q.parentElement.classList.remove("filled");
+        render();
+        q.focus();
+      });
+    }
+  }
+
+  window.addEventListener("resize", () => movePill(links.find((l) => l.classList.contains("active"))));
+  document.fonts && document.fonts.ready.then(() =>
+    movePill(links.find((l) => l.classList.contains("active")))
   );
+
+  /* ---------------------------------------------------------------
+     7. first paint
+  --------------------------------------------------------------- */
+  Object.keys(order).forEach(renderRow);
+  renderTray();
+  render();
+  requestAnimationFrame(() => movePill(links.find((l) => l.classList.contains("active"))));
+})();
 </script>
 
 </body>
