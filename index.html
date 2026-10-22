@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>منوی کافه خوارزم | Coffe Sam</title>
-<meta name="description" content="منوی کافه خوارزم — چای، دمنوش، کافی، آب‌میوه، غذا و قلیان" />
+<meta name="description" content="منوی کافه خوارزم — چای، دمنوش، کافی، آب‌میوه، غذا، کیک و دسر و قلیان" />
 <meta name="theme-color" content="#0b0908" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -620,6 +620,7 @@
       <a href="#coffee">کافی</a>
       <a href="#juice">آب‌میوه</a>
       <a href="#food">غذا</a>
+      <a href="#dessert">کیک و دسر</a>
       <a href="#ghelyan">قلیان</a>
     </div>
   </div>
@@ -682,6 +683,16 @@
 
   <section id="food" aria-labelledby="h-food">
     <div class="sec-head"><h2 id="h-food">غذا</h2><span class="en">Food</span></div>
+    <ul class="items">
+      <li data-id="hotdog" data-ic="hotdog"><span class="item-name">هات‌داگ</span><span class="price"></span></li>
+      <li data-id="hotdog-special" data-ic="hotdog"><span class="item-name">هات‌داگ ویژه</span><span class="price"></span></li>
+      <li data-id="fries" data-ic="fries"><span class="item-name">سیب‌زمینی</span><span class="price"></span></li>
+      <li data-id="fries-special" data-ic="fries"><span class="item-name">سیب‌زمینی ویژه</span><span class="price"></span></li>
+    </ul>
+  </section>
+
+  <section id="dessert" aria-labelledby="h-dessert">
+    <div class="sec-head"><h2 id="h-dessert">کیک و دسر</h2><span class="en">Dessert</span></div>
     <ul class="items">
       <li data-id="i28" data-ic="cake"><span class="item-name">کیک شکلاتی</span><span class="price"></span></li>
       <li data-id="carrot-cake" data-ic="cake"><span class="item-name">کیک هویج</span><span class="price"></span></li>
@@ -832,6 +843,11 @@
       '<path d="M18 26h28"/><path d="M40 26 49 12"/>' +
       '<path d="M22 26c1-6 5-9 10-9s9 3 10 9" ' + F + '/>' +
       '<circle cx="27" cy="14" r="2.5" fill="currentColor" stroke="none"/>'
+    ),
+    hotdog: S(
+      '<rect x="10" y="20" width="44" height="26" rx="13" ' + F + '/>' +
+      '<rect x="8" y="26" width="48" height="12" rx="6" ' + F + '/>' +
+      '<path d="m18 32 5-3 6 6 6-6 6 6 5-3"/>'
     ),
     fries: S(
       '<path ' + F + ' d="M19 30h26l-3 20a4 4 0 0 1-4 3H26a4 4 0 0 1-4-3Z"/>' +
@@ -1279,4 +1295,5 @@
 
 </body>
 </html>
+
 
